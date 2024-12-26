@@ -13,11 +13,11 @@ interface TaskInputProps {
   setNewTask: (task: string) => void;
   selectedColumn: string;
   setSelectedColumn: (column: string) => void;
-  columns: { id: string; title: string }[];
-  importance: string;
-  setImportance: (importance: string) => void;
-  urgency: string;
-  setUrgency: (urgency: string) => void;
+  columns: { id: number; title: string }[];
+  importance: "high" | "low";
+  setImportance: (importance: "high" | "low") => void;
+  urgency: "urgent" | "not urgent";
+  setUrgency: (urgency: "urgent" | "not urgent") => void;
   addTask: () => void;
 }
 
@@ -47,7 +47,7 @@ export const TaskInput = ({
       </SelectTrigger>
       <SelectContent>
         {columns.map((column) => (
-          <SelectItem key={column.id} value={column.id}>
+          <SelectItem key={column.id} value={column.id.toString()}>
             {column.title}
           </SelectItem>
         ))}

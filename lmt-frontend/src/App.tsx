@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { DragDropContext } from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TaskInput } from "./components/TaskInput.tsx";
 import { ColumnInput } from "./components/ColumnInput.tsx";
 import { Column } from "./components/Column.tsx";
-import React from "react";
 
 type Task = {
   id: number;
@@ -171,14 +170,16 @@ export default function App() {
     fetchColumnsData();
   }, []);
 
-  const onDragEnd = (result: any) => {
+  const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
     const sourceColumn = columns.find(
-      (column) => column.id === result.source.droppableId.split("-")[0]
+      (column) => column.id === Number(result.source.droppableId.split("-")[0])
     );
     const destColumn = columns.find(
-      (column) => column.id === result.destination.droppableId.split("-")[0]
+      (column) =>
+        result.destination &&
+        column.id === Number(result.destination.droppableId.split("-")[0])
     );
     const [reorderedItem] = sourceColumn!.tasks.splice(result.source.index, 1);
 
@@ -211,8 +212,10 @@ export default function App() {
       <TaskInput
         newTask={newTask}
         setNewTask={setNewTask}
-        selectedColumn={selectedColumn}
-        setSelectedColumn={setSelectedColumn}
+        selectedColumn={selectedColumn.toString()}
+        setSelectedColumn={(column: string) =>
+          setSelectedColumn(Number(column))
+        }
         columns={columns}
         importance={importance}
         setImportance={setImportance}
@@ -230,7 +233,7 @@ export default function App() {
 
       {/* Columns with Drag & Drop */}
       <DragDropContext onDragEnd={onDragEnd}>
-        <ScrollArea className="w-full" orientation="horizontal">
+        <ScrollArea className="w-full">
           {columns.length < 1 ? (
             <div className="text-3xl text-white font-semibold bg-gradient-to-tl from-teal-400 to-cyan-400 mt-16 mx-auto text-center w-fit p-32 rounded-3xl">
               Add a Column to start the Management process
