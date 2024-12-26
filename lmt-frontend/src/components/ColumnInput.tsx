@@ -1,11 +1,17 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+interface ColumnInputProps {
+  newColumnTitle: string;
+  setNewColumnTitle: (title: string) => void;
+  addColumn: () => void;
+}
+
 export const ColumnInput = ({
   newColumnTitle,
   setNewColumnTitle,
   addColumn,
-}) => (
+}: ColumnInputProps) => (
   <div className="mb-6 flex gap-2 justify-center">
     <Input
       type="text"

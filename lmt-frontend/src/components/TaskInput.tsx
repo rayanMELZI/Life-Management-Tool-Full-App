@@ -8,6 +8,19 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+interface TaskInputProps {
+  newTask: string;
+  setNewTask: (task: string) => void;
+  selectedColumn: string;
+  setSelectedColumn: (column: string) => void;
+  columns: { id: string; title: string }[];
+  importance: string;
+  setImportance: (importance: string) => void;
+  urgency: string;
+  setUrgency: (urgency: string) => void;
+  addTask: () => void;
+}
+
 export const TaskInput = ({
   newTask,
   setNewTask,
@@ -19,7 +32,7 @@ export const TaskInput = ({
   urgency,
   setUrgency,
   addTask,
-}) => (
+}: TaskInputProps) => (
   <div className="mb-6 flex flex-wrap gap-2 justify-center">
     <Input
       type="text"
