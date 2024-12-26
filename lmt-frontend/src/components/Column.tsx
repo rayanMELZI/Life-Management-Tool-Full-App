@@ -5,10 +5,15 @@ import {
   CardTitle,
 } from "../components/ui/card.tsx";
 import { Button } from "../components/ui/button";
-// import { Button } from "../components/ui/Button.tsx";
 import { X } from "lucide-react";
 import { EisenhowerMatrix } from "./EisenhowerMatrix.tsx";
-import { Task } from "@/types";
+
+type Task = {
+  id: number;
+  content: string;
+  importance: "high" | "low";
+  urgency: "urgent" | "not urgent";
+};
 
 type ColumnProps = {
   column: { id: number; title: string; tasks: Task[] };

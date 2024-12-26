@@ -1,6 +1,9 @@
-import React from "react";
-
-import { Droppable, Draggable } from "react-beautiful-dnd";
+import {
+  Droppable,
+  DroppableProvided,
+  Draggable,
+  DraggableProvided,
+} from "react-beautiful-dnd";
 import { ScrollArea } from "../components/ui/scroll-area.tsx";
 import { Button } from "./ui/button.tsx";
 import { X } from "lucide-react";
@@ -59,7 +62,7 @@ export const EisenhowerMatrix = ({
           key={`${columnId}-${quadrant.importance}-${quadrant.urgency}`}
           droppableId={`${columnId}-${quadrant.importance}-${quadrant.urgency}`}
         >
-          {(provided: any) => (
+          {(provided: DroppableProvided) => (
             <div
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -77,10 +80,10 @@ export const EisenhowerMatrix = ({
                     .map((task, index) => (
                       <Draggable
                         key={task.id}
-                        draggableId={task.id}
+                        draggableId={task.id.toString()}
                         index={index}
                       >
-                        {(provided: any) => (
+                        {(provided: DraggableProvided) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
