@@ -19,10 +19,10 @@ public class TaskController {
         this.taskService = taskService;
     }
     
-    @PostMapping("/add")
-    public String addTask(@RequestBody Task task){
-        TaskService.addTask(task.getContent(), task.getImportance(), task.getUrgency(), task.getColumnId());
-        // TaskService.addTask(task);
-        return "Task added successfully";
-    }
+    // @PostMapping("/add")
+    // public String addTask(@RequestBody Task task){
+    //     TaskService.addTask(task.getContent(), task.getImportance(), task.getUrgency(), task.getColumnId());
+    //     // TaskService.addTask(task);
+    //     return "Task added successfully";
+    // }
 }

@@ -1,0 +1,4 @@
+target/*.war
+target/test-classes
+*.mvn
+*.git
