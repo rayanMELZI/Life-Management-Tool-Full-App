@@ -23,4 +23,5 @@ COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 
 # Command to run the app
-CMD ["java", "-Dserver.port=$PORT", "-jar", "app.jar"]
+CMD ["java", "-Dserver.port=${PORT:-8080}", "-jar", "app.jar"]
+
