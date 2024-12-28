@@ -1,13 +1,25 @@
-# Use a lightweight JDK image
-FROM openjdk:17-jdk-slim
+# Stage 1 - Build the application
+FROM maven:3.8.7-openjdk-17 AS build
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the built jar file to the container
-COPY target/lmt-0.0.1-SNAPSHOT.jar app.jar
+# Copy the pom.xml and download dependencies (optimize caching)
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-# Expose the port your app will run on
+# Copy source code and build the application
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2 - Run the application
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+# Copy the built jar file from the previous stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose the port
 EXPOSE 8080
 
 # Command to run the app
