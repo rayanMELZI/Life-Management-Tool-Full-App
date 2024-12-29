@@ -28,6 +28,12 @@ public class DomainColumnService {
         domainColumnRepository.save(domainColumn);
     }
 
+    public void updateDomainColumn(Integer id, String title){
+        DomainColumn domainColumn = domainColumnRepository.findById(id).get();
+        domainColumn.setTitle(title);
+        domainColumnRepository.save(domainColumn);
+    }
+
     // deleteDomainColumn
     public void deleteDomainColumn(Integer id){
         domainColumnRepository.deleteById(id);

@@ -47,14 +47,14 @@ public class DomainColumnController {
         return domainColumns;
     }
     
-    // @PutMapping
-    // public void updateColumn(
-    //     @RequestParam("id") Integer id,
-    //     @RequestParam("name") String name
-    // ) {
-    //     DomainColumn column = new DomainColumn(id, name);
-    //     column.setName(name);
-    // }
+    //update column's title
+    @PutMapping("/update")
+    public String updateColumn(
+        @RequestBody DomainColumn domainColumn
+    ) {
+        domainColumnService.updateDomainColumn( domainColumn.getId(), domainColumn.getTitle());
+        return "Column updated successfully";
+    }
     
     @DeleteMapping("/delete")
     public String deleteColumn(@RequestBody DomainColumn domainColumn) {
