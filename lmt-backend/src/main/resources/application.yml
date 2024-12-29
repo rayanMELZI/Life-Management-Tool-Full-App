@@ -5,10 +5,15 @@ spring:
   application:
     name: lmt
 
+  # datasource:
+  #   url: jdbc:mysql://localhost:3306/lmt_springboot
+  #   username: root
+  #   password: root
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
   datasource:
-    url: jdbc:mysql://localhost:3306/lmt_springboot
-    username: root
-    password: root
+    url: jdbc:mysql://ucvuxuwxx8bzpqf7:SJ6NCFfStKuBct6D8fPu@bqpylawal2tfg6g2yaow-mysql.services.clever-cloud.com:3306/bqpylawal2tfg6g2yaow
+    username: ucvuxuwxx8bzpqf7
+    password: SJ6NCFfStKuBct6D8fPu
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -20,3 +25,7 @@ spring:
         "[format_sql]": true
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
+
+springdoc:
+  swagger-ui:
+    path: /api-docs

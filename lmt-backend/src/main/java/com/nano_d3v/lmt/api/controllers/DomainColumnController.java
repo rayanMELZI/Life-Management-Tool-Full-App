@@ -15,7 +15,8 @@ import com.nano_d3v.lmt.api.models.DomainColumn;
 import com.nano_d3v.lmt.services.DomainColumnService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+// @CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("/api/domainColumn")
 public class DomainColumnController {
 
