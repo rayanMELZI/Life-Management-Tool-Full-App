@@ -89,7 +89,7 @@ export default function App() {
     const addColumnToDatabase = async () => {
       try {
         const response = await fetch(
-          `${process.env.BACKEND_DOMAIN}/api/domainColumn/add`,
+          `${process.env.REACT_APP_BACKEND_DOMAIN}/api/domainColumn/add`,
           {
             method: "POST",
             headers: {
@@ -127,7 +127,7 @@ export default function App() {
     const removeColumnFromDatabase = async () => {
       try {
         const response = await fetch(
-          `${process.env.BACKEND_DOMAIN}/api/domainColumn/delete`,
+          `${process.env.REACT_APP_BACKEND_DOMAIN}/api/domainColumn/delete`,
           {
             method: "DELETE",
             headers: {
@@ -155,7 +155,7 @@ export default function App() {
     const fetchColumnsData = async () => {
       try {
         const response = await fetch(
-          `${process.env.BACKEND_DOMAIN}/api/domainColumn/all`
+          `${process.env.REACT_APP_BACKEND_DOMAIN}/api/domainColumn/all`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
