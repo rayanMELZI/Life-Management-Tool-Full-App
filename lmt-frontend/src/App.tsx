@@ -19,9 +19,6 @@ type ColumnType = {
 };
 
 export default function App() {
-  // const domain = "http://localhost:8080";
-  const domain = "https://life-management-tool-server.onrender.com";
-
   const [columns, setColumns] = useState<ColumnType[]>([
     // { id: 0, title: "LMT", tasks: [] },
   ]);
@@ -91,13 +88,16 @@ export default function App() {
     // interaction with database
     const addColumnToDatabase = async () => {
       try {
-        const response = await fetch(`${domain}/api/domainColumn/add`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ title: newColumn.title }),
-        });
+        const response = await fetch(
+          `${process.env.BACKEND_DOMAIN}/api/domainColumn/add`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ title: newColumn.title }),
+          }
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -126,13 +126,16 @@ export default function App() {
     // interaction with database
     const removeColumnFromDatabase = async () => {
       try {
-        const response = await fetch(`${domain}/api/domainColumn/delete`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: columnId }),
-        });
+        const response = await fetch(
+          `${process.env.BACKEND_DOMAIN}/api/domainColumn/delete`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: columnId }),
+          }
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -151,7 +154,9 @@ export default function App() {
   useEffect(() => {
     const fetchColumnsData = async () => {
       try {
-        const response = await fetch(`${domain}/api/domainColumn/all`);
+        const response = await fetch(
+          `${process.env.BACKEND_DOMAIN}/api/domainColumn/all`
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
