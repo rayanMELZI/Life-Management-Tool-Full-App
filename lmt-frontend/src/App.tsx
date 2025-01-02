@@ -104,7 +104,7 @@ export default function App() {
         }
 
         const res = await response.text();
-        console.log(res);
+        console.log("Columns uploaded successfully:", res);
       } catch (error) {
         console.error("Failed to add column to database:", error);
       }
