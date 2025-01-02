@@ -21,7 +21,7 @@ type ColumnType = {
 export default function App() {
   // const domain = "http://localhost:8080";
   // const domain = "https://life-management-tool-server.onrender.com";
-  const domain = process.env.REACT_APP_BACKEND_DOMAIN;
+  const domain = import.meta.env.VITE_BACKEND_DOMAIN;
 
   const [columns, setColumns] = useState<ColumnType[]>([
     // { id: 0, title: "LMT", tasks: [] },
