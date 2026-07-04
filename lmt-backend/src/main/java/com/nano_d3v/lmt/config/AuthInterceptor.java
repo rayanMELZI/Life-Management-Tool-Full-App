@@ -1,6 +1,7 @@
 package com.nano_d3v.lmt.config;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.lang.NonNull;
@@ -36,7 +37,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             Optional<User> user = userRepository.findByToken(header.substring("Bearer ".length()));
-            if (user.isPresent()) {
+            if (user.isPresent() && !isExpired(user.get())) {
                 request.setAttribute("user", user.get());
                 return true;
             }
@@ -46,5 +47,10 @@ public class AuthInterceptor implements HandlerInterceptor {
         response.setContentType("application/json");
         response.getWriter().write("{\"message\":\"Please sign in to continue\"}");
         return false;
+    }
+
+    private boolean isExpired(User user) {
+        return user.getTokenExpiresAt() == null
+                || user.getTokenExpiresAt().isBefore(Instant.now());
     }
 }

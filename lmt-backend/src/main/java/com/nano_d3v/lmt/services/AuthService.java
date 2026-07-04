@@ -1,5 +1,7 @@
 package com.nano_d3v.lmt.services;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -16,6 +18,8 @@ public class AuthService {
 
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+
+    private static final Duration TOKEN_LIFETIME = Duration.ofDays(30);
 
     public final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -41,7 +45,7 @@ public class AuthService {
         }
 
         User user = new User(normalizedEmail, name.trim(), passwordEncoder.encode(password));
-        user.setToken(UUID.randomUUID().toString());
+        issueToken(user);
         return userRepository.save(user);
     }
 
@@ -54,14 +58,20 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
-        user.setToken(UUID.randomUUID().toString());
+        issueToken(user);
         return userRepository.save(user);
     }
 
     // invalidate the token so it can no longer be used
     public void logout(User user) {
         user.setToken(null);
+        user.setTokenExpiresAt(null);
         userRepository.save(user);
+    }
+
+    private void issueToken(User user) {
+        user.setToken(UUID.randomUUID().toString());
+        user.setTokenExpiresAt(Instant.now().plus(TOKEN_LIFETIME));
     }
 
     private String normalizeEmail(String email) {

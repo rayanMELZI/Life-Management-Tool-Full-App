@@ -1,5 +1,7 @@
 package com.nano_d3v.lmt.api.models;
 
+import java.time.Instant;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -32,6 +34,11 @@ public class User {
     @JsonIgnore
     @Column(name = "token")
     private String token;
+
+    // moment after which the token is no longer accepted
+    @JsonIgnore
+    @Column(name = "token_expires_at")
+    private Instant tokenExpiresAt;
 
     public User() {
     }
@@ -80,5 +87,13 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Instant getTokenExpiresAt() {
+        return tokenExpiresAt;
+    }
+
+    public void setTokenExpiresAt(Instant tokenExpiresAt) {
+        this.tokenExpiresAt = tokenExpiresAt;
     }
 }
