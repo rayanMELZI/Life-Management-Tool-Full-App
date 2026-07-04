@@ -32,6 +32,8 @@ export default function App() {
   const [importance, setImportance] = useState<"high" | "low">("high");
   const [urgency, setUrgency] = useState<"urgent" | "not urgent">("urgent");
   const [newColumnTitle, setNewColumnTitle] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const addTask = async () => {
     if (newTask.trim() === "") return;
@@ -64,8 +66,10 @@ export default function App() {
         )
       );
       setNewTask("");
+      setErrorMessage("");
     } catch (error) {
       console.error("Failed to add task to database:", error);
+      setErrorMessage("Could not add the task. Please try again.");
     }
   };
 
@@ -92,6 +96,7 @@ export default function App() {
         }
       } catch (error) {
         console.error("Failed to delete task from database:", error);
+        setErrorMessage("Could not delete the task. Please try again.");
       }
     };
     removeTaskFromDatabase();
@@ -132,8 +137,10 @@ export default function App() {
       setColumns([...columns, savedColumn]);
       setNewColumnTitle("");
       setSelectedColumn(savedColumn.id);
+      setErrorMessage("");
     } catch (error) {
       console.error("Failed to add column to database:", error);
+      setErrorMessage("Could not add the column. Please try again.");
     }
   };
 
@@ -167,13 +174,14 @@ export default function App() {
       );
     } catch (error) {
       console.error("Failed to rename column in database:", error);
+      setErrorMessage("Could not rename the column. Please try again.");
     }
   };
 
   const removeColumn = (columnId: number) => {
     // Show confirmation dialog
     const isConfirmed = globalThis.confirm(
-      "Are you sure you want to delete this task?"
+      "Are you sure you want to delete this column and all of its tasks?"
     );
 
     if (!isConfirmed) return; // If the user cancels, stop the deletion.
@@ -195,6 +203,7 @@ export default function App() {
         console.log(res);
       } catch (error) {
         console.error("Failed to delete column to database:", error);
+        setErrorMessage("Could not delete the column. Please try again.");
       }
     };
     removeColumnFromDatabase();
@@ -217,6 +226,11 @@ export default function App() {
         }
       } catch (error) {
         console.error("Failed to fetch columns data:", error);
+        setErrorMessage(
+          "Could not load your columns. Please check your connection and refresh the page."
+        );
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -266,6 +280,7 @@ export default function App() {
         }
       } catch (error) {
         console.error("Failed to update task in database:", error);
+        setErrorMessage("Could not save the task's new position. Please try again.");
       }
     };
     updateTaskInDatabase();
@@ -286,6 +301,14 @@ export default function App() {
       <h1 className="text-4xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
         Life Management Tool
       </h1>
+
+      {/* Error banner */}
+      {errorMessage && (
+        <div className="mb-4 mx-auto max-w-xl rounded-lg bg-red-100 border border-red-300 text-red-700 px-4 py-2 text-center text-sm">
+          {errorMessage}
+        </div>
+      )}
+
       {/* Task Input */}
       <TaskInput
         newTask={newTask}
@@ -312,7 +335,11 @@ export default function App() {
       {/* Columns with Drag & Drop */}
       <DragDropContext onDragEnd={onDragEnd}>
         <ScrollArea className="w-full">
-          {columns.length < 1 ? (
+          {isLoading ? (
+            <div className="text-xl text-indigo-500 font-semibold mt-16 mx-auto text-center">
+              Loading your columns...
+            </div>
+          ) : columns.length < 1 ? (
             <div className="text-3xl text-white font-semibold bg-gradient-to-tl from-teal-400 to-cyan-400 mt-16 mx-auto text-center w-fit p-32 rounded-3xl">
               Add a Column to start the Management process
             </div>
