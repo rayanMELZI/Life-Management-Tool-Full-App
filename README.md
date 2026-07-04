@@ -7,10 +7,12 @@ quadrants and columns, and everything is saved to the database.
 
 ## Features
 
+- Personal accounts: sign up, sign in, and keep your board private
 - Create, rename and delete columns (life domains)
 - Add tasks with an importance and urgency level
 - Drag and drop tasks between quadrants — the new position is saved
 - Delete tasks and columns with confirmation
+- Built-in guide introducing the app and the Eisenhower method
 - All data persisted through the REST API
 
 ## Tech stack
@@ -55,9 +57,17 @@ The app runs on `http://localhost:5173`.
 
 ## API overview
 
+Register or log in first: both return a token, and every other endpoint
+requires it in an `Authorization: Bearer <token>` header. Each user only
+ever sees their own columns and tasks.
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| GET | `/api/domainColumn/all` | All columns with their tasks |
+| POST | `/api/auth/register` | Create an account, returns a token |
+| POST | `/api/auth/login` | Sign in, returns a fresh token |
+| POST | `/api/auth/logout` | Invalidate the current token |
+| GET | `/api/auth/me` | Check who the token belongs to |
+| GET | `/api/domainColumn/all` | The user's columns with their tasks |
 | POST | `/api/domainColumn/add` | Create a column |
 | PUT | `/api/domainColumn/update` | Rename a column |
 | DELETE | `/api/domainColumn/delete` | Delete a column and its tasks |
