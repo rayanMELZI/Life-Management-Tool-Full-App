@@ -6,6 +6,7 @@ import { TaskInput } from "./components/TaskInput.tsx";
 import { ColumnInput } from "./components/ColumnInput.tsx";
 import { Column } from "./components/Column.tsx";
 import { AuthPage } from "./components/AuthPage.tsx";
+import { Guide } from "./components/Guide.tsx";
 
 type Task = {
   id: number;
@@ -26,6 +27,7 @@ type Auth = {
 };
 
 const AUTH_STORAGE_KEY = "lmt-auth";
+const GUIDE_SEEN_KEY = "lmt-guide-seen";
 
 export default function App() {
   // const domain = "http://localhost:8080";
@@ -66,6 +68,19 @@ export default function App() {
       throw new Error("Session expired");
     }
     return response;
+  };
+
+  // show the guide automatically the first time someone signs in
+  const [showGuide, setShowGuide] = useState(false);
+  useEffect(() => {
+    if (auth && !localStorage.getItem(GUIDE_SEEN_KEY)) {
+      setShowGuide(true);
+    }
+  }, [auth]);
+
+  const closeGuide = () => {
+    localStorage.setItem(GUIDE_SEEN_KEY, "1");
+    setShowGuide(false);
   };
 
   const handleAuth = (newAuth: Auth) => {
@@ -338,10 +353,19 @@ export default function App() {
 
   return (
     <div className="p-4 min-h-screen bg-gradient-to-br from-purple-100 via-indigo-100 to-blue-100">
+      {showGuide && <Guide onClose={closeGuide} />}
       <div className="flex justify-end items-center gap-3 mb-2">
         <span className="text-sm text-gray-600">
           Signed in as <span className="font-semibold">{auth.username}</span>
         </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowGuide(true)}
+          className="bg-white/50 border-indigo-200"
+        >
+          Guide
+        </Button>
         <Button
           variant="outline"
           size="sm"
