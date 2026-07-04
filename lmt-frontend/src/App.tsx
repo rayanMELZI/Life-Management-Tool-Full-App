@@ -217,6 +217,31 @@ export default function App() {
     destColumn!.tasks.push(reorderedItem);
 
     setColumns([...columns]);
+
+    // interaction with database
+    const updateTaskInDatabase = async () => {
+      try {
+        const response = await fetch(`${domain}/api/task/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: reorderedItem.id,
+            content: reorderedItem.content,
+            importance: reorderedItem.importance,
+            urgency: reorderedItem.urgency,
+            columnId: destColumn!.id,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Failed to update task in database:", error);
+      }
+    };
+    updateTaskInDatabase();
   };
 
   const getTaskColor = (importance: string, urgency: string) => {
