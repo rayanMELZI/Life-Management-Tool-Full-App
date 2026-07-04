@@ -1,5 +1,8 @@
 server:
   port: ${PORT:8080}
+  error:
+    # expose error messages so the client can show them to the user
+    include-message: always
 
 spring:
   application:
