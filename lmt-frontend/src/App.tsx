@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { TaskInput } from "./components/TaskInput.tsx";
 import { ColumnInput } from "./components/ColumnInput.tsx";
 import { Column } from "./components/Column.tsx";
+import { AuthPage } from "./components/AuthPage.tsx";
 
 type Task = {
   id: number;
@@ -17,6 +19,13 @@ type ColumnType = {
   title: string;
   tasks: Task[];
 };
+
+type Auth = {
+  username: string;
+  token: string;
+};
+
+const AUTH_STORAGE_KEY = "lmt-auth";
 
 export default function App() {
   // const domain = "http://localhost:8080";
@@ -35,17 +44,55 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [auth, setAuth] = useState<Auth | null>(() => {
+    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+    return stored ? (JSON.parse(stored) as Auth) : null;
+  });
+
+  // fetch wrapper that sends the token and signs out when it is rejected
+  const apiFetch = async (path: string, options: RequestInit = {}) => {
+    const response = await fetch(`${domain}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(auth ? { Authorization: `Bearer ${auth.token}` } : {}),
+        ...options.headers,
+      },
+    });
+    if (response.status === 401) {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      setAuth(null);
+      setColumns([]);
+      throw new Error("Session expired");
+    }
+    return response;
+  };
+
+  const handleAuth = (newAuth: Auth) => {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newAuth));
+    setAuth(newAuth);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await apiFetch("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+      console.error("Failed to log out on the server:", error);
+    }
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    setAuth(null);
+    setColumns([]);
+    setErrorMessage("");
+  };
+
   const addTask = async () => {
     if (newTask.trim() === "") return;
     if (!columns.some((column) => column.id === selectedColumn)) return;
 
     // interaction with database
     try {
-      const response = await fetch(`${domain}/api/task/add`, {
+      const response = await apiFetch("/api/task/add", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           content: newTask,
           importance,
@@ -84,11 +131,8 @@ export default function App() {
     // interaction with database
     const removeTaskFromDatabase = async () => {
       try {
-        const response = await fetch(`${domain}/api/task/delete`, {
+        const response = await apiFetch("/api/task/delete", {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({ id: taskId }),
         });
         if (!response.ok) {
@@ -120,11 +164,8 @@ export default function App() {
 
     // interaction with database
     try {
-      const response = await fetch(`${domain}/api/domainColumn/add`, {
+      const response = await apiFetch("/api/domainColumn/add", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ title: newColumnTitle }),
       });
       if (!response.ok) {
@@ -154,11 +195,8 @@ export default function App() {
 
     // interaction with database
     try {
-      const response = await fetch(`${domain}/api/domainColumn/update`, {
+      const response = await apiFetch("/api/domainColumn/update", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ id: columnId, title: newTitle.trim() }),
       });
       if (!response.ok) {
@@ -189,11 +227,8 @@ export default function App() {
     // interaction with database
     const removeColumnFromDatabase = async () => {
       try {
-        const response = await fetch(`${domain}/api/domainColumn/delete`, {
+        const response = await apiFetch("/api/domainColumn/delete", {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({ id: columnId }),
         });
         if (!response.ok) {
@@ -211,11 +246,14 @@ export default function App() {
     setColumns(columns.filter((column) => column.id !== columnId));
   };
 
-  // Load existing Columns from the database (each time the data change)
+  // Load the signed-in user's columns from the database
   useEffect(() => {
+    if (!auth) return;
+
     const fetchColumnsData = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch(`${domain}/api/domainColumn/all`);
+        const response = await apiFetch("/api/domainColumn/all");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -235,7 +273,8 @@ export default function App() {
     };
 
     fetchColumnsData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.token]);
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -262,11 +301,8 @@ export default function App() {
     // interaction with database
     const updateTaskInDatabase = async () => {
       try {
-        const response = await fetch(`${domain}/api/task/update`, {
+        const response = await apiFetch("/api/task/update", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             id: reorderedItem.id,
             content: reorderedItem.content,
@@ -296,8 +332,26 @@ export default function App() {
     return "bg-gradient-to-r from-green-500 to-emerald-500 text-white";
   };
 
+  if (!auth) {
+    return <AuthPage domain={domain} onAuth={handleAuth} />;
+  }
+
   return (
     <div className="p-4 min-h-screen bg-gradient-to-br from-purple-100 via-indigo-100 to-blue-100">
+      <div className="flex justify-end items-center gap-3 mb-2">
+        <span className="text-sm text-gray-600">
+          Signed in as <span className="font-semibold">{auth.username}</span>
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleLogout}
+          className="bg-white/50 border-indigo-200"
+        >
+          Sign Out
+        </Button>
+      </div>
+
       <h1 className="text-4xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
         Life Management Tool
       </h1>
