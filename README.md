@@ -7,7 +7,7 @@ quadrants and columns, and everything is saved to the database.
 
 ## Features
 
-- Personal accounts: sign up, sign in, and keep your board private
+- Personal accounts: sign up with your email, sign in, and keep your board private
 - Create, rename and delete columns (life domains)
 - Add tasks with an importance and urgency level
 - Drag and drop tasks between quadrants — the new position is saved
@@ -57,9 +57,10 @@ The app runs on `http://localhost:5173`.
 
 ## API overview
 
-Register or log in first: both return a token, and every other endpoint
-requires it in an `Authorization: Bearer <token>` header. Each user only
-ever sees their own columns and tasks.
+Register (name, email, password of 8+ characters) or log in (email,
+password) first: both return a token valid for 30 days, and every other
+endpoint requires it in an `Authorization: Bearer <token>` header. Each
+user only ever sees their own columns and tasks.
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
