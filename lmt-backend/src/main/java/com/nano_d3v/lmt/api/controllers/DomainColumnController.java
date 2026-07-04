@@ -28,11 +28,10 @@ public class DomainColumnController {
     }
 
     @PostMapping("/add")
-    public String addColumn(
+    public DomainColumn addColumn(
         @RequestBody DomainColumn domainColumn
     ) {
-        domainColumnService.addDomainColumn(domainColumn.getTitle());
-        return "Column added successfully";
+        return domainColumnService.addDomainColumn(domainColumn.getTitle());
     }
     
     // @GetMapping("/id")

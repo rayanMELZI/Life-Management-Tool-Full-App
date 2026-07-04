@@ -31,9 +31,9 @@ public class DomainColumnService {
     }
 
     // addDomainColumn
-    public void addDomainColumn(String title) {
+    public DomainColumn addDomainColumn(String title) {
         DomainColumn domainColumn = new DomainColumn(title);
-        domainColumnRepository.save(domainColumn);
+        return domainColumnRepository.save(domainColumn);
     }
 
     public void updateDomainColumn(Integer id, String title){
