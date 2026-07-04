@@ -1,6 +1,5 @@
 package com.nano_d3v.lmt.api.controllers;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,7 +11,6 @@ import com.nano_d3v.lmt.api.models.Task;
 import com.nano_d3v.lmt.services.TaskService;
 
 @RestController
-@CrossOrigin(origins = "https://life-management-tool.onrender.com")
 @RequestMapping("/api/task")
 public class TaskController {
 

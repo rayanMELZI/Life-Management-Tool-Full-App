@@ -2,7 +2,6 @@ package com.nano_d3v.lmt.api.controllers;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +14,6 @@ import com.nano_d3v.lmt.api.models.DomainColumn;
 import com.nano_d3v.lmt.services.DomainColumnService;
 
 @RestController
-// @CrossOrigin(origins = "http://localhost:5173")
-// @CrossOrigin(origins = "http://localhost:8080")
-@CrossOrigin(origins = "https://life-management-tool.onrender.com")
 @RequestMapping("/api/domainColumn")
 public class DomainColumnController {
 
