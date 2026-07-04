@@ -5,15 +5,12 @@ spring:
   application:
     name: lmt
 
-  # datasource:
-  #   url: jdbc:mysql://localhost:3306/lmt_springboot
-  #   username: root
-  #   password: root
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  # set DB_URL, DB_USERNAME and DB_PASSWORD environment variables in
+  # production; the defaults below are for a local MySQL instance
   datasource:
-    url: jdbc:mysql://ucvuxuwxx8bzpqf7:SJ6NCFfStKuBct6D8fPu@bqpylawal2tfg6g2yaow-mysql.services.clever-cloud.com:3306/bqpylawal2tfg6g2yaow
-    username: ucvuxuwxx8bzpqf7
-    password: SJ6NCFfStKuBct6D8fPu
+    url: ${DB_URL:jdbc:mysql://localhost:3306/lmt_springboot?createDatabaseIfNotExist=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
