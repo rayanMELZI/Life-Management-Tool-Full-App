@@ -14,4 +14,6 @@ public interface TaskRepository extends CrudRepository<Task, Integer> {
     List<Task> findAll();
 
     List<Task> findByColumnId(Integer columnId);
+
+    void deleteByColumnId(Integer columnId);
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 
 @Entity
 public class DomainColumn {
@@ -20,8 +21,10 @@ public class DomainColumn {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "tasks")
-    private List<String> tasks = new ArrayList<>();
+    // Tasks live in their own table (keyed by column_id) and are attached here
+    // when columns are sent to the client
+    @Transient
+    private List<Task> tasks = new ArrayList<>();
 
     public DomainColumn() {
     }
@@ -47,11 +50,11 @@ public class DomainColumn {
     }
 
     
-    public List<String> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(List<String> tasks) {
+    public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
 

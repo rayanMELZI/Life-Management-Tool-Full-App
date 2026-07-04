@@ -4,22 +4,30 @@ package com.nano_d3v.lmt.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nano_d3v.lmt.api.models.DomainColumn;
 import com.nano_d3v.lmt.api.repositories.DomainColumnRepository;
+import com.nano_d3v.lmt.api.repositories.TaskRepository;
 
 @Service
 public class DomainColumnService {
 
     public final DomainColumnRepository domainColumnRepository;
+    public final TaskRepository taskRepository;
 
-    public DomainColumnService(DomainColumnRepository domainColumnRepository) {
+    public DomainColumnService(DomainColumnRepository domainColumnRepository, TaskRepository taskRepository) {
         this.domainColumnRepository = domainColumnRepository;
+        this.taskRepository = taskRepository;
     }
-    
-    // getAllColumns
+
+    // getAllColumns with their tasks
     public List<DomainColumn> getAllColumns(){
-        return domainColumnRepository.findAll();
+        List<DomainColumn> domainColumns = domainColumnRepository.findAll();
+        for (DomainColumn domainColumn : domainColumns) {
+            domainColumn.setTasks(taskRepository.findByColumnId(domainColumn.getId()));
+        }
+        return domainColumns;
     }
 
     // addDomainColumn
@@ -34,8 +42,10 @@ public class DomainColumnService {
         domainColumnRepository.save(domainColumn);
     }
 
-    // deleteDomainColumn
+    // deleteDomainColumn along with its tasks
+    @Transactional
     public void deleteDomainColumn(Integer id){
+        taskRepository.deleteByColumnId(id);
         domainColumnRepository.deleteById(id);
     }
 }
