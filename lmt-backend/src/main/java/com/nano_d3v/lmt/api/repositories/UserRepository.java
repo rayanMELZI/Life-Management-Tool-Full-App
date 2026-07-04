@@ -10,7 +10,7 @@ import com.nano_d3v.lmt.api.models.User;
 @Repository
 public interface UserRepository extends CrudRepository<User, Integer> {
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 
     Optional<User> findByToken(String token);
 }

@@ -1,6 +1,7 @@
 package com.nano_d3v.lmt.services;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,6 +14,9 @@ import com.nano_d3v.lmt.api.repositories.UserRepository;
 @Service
 public class AuthService {
 
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+
     public final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -21,29 +25,33 @@ public class AuthService {
     }
 
     // create a new account and sign it in
-    public User register(String username, String password) {
-        if (username == null || username.trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose a username");
+    public User register(String name, String email, String password) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please enter your name");
         }
-        if (password == null || password.length() < 4) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password must be at least 4 characters long");
+        String normalizedEmail = normalizeEmail(email);
+        if (!EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please enter a valid email address");
         }
-        if (userRepository.findByUsername(username.trim()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "This username is already taken");
+        if (password == null || password.length() < 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password must be at least 8 characters long");
+        }
+        if (userRepository.findByEmail(normalizedEmail).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "An account with this email already exists");
         }
 
-        User user = new User(username.trim(), passwordEncoder.encode(password));
+        User user = new User(normalizedEmail, name.trim(), passwordEncoder.encode(password));
         user.setToken(UUID.randomUUID().toString());
         return userRepository.save(user);
     }
 
     // verify the credentials and issue a fresh token
-    public User login(String username, String password) {
-        User user = userRepository.findByUsername(username == null ? "" : username.trim())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password"));
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(normalizeEmail(email))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
         if (password == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
         user.setToken(UUID.randomUUID().toString());
@@ -54,5 +62,9 @@ public class AuthService {
     public void logout(User user) {
         user.setToken(null);
         userRepository.save(user);
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 }

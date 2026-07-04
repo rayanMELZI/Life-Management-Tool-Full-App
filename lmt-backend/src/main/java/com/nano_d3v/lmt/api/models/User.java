@@ -18,8 +18,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @JsonIgnore
     @Column(name = "password_hash", nullable = false)
@@ -33,8 +36,9 @@ public class User {
     public User() {
     }
 
-    public User(String username, String passwordHash) {
-        this.username = username;
+    public User(String email, String name, String passwordHash) {
+        this.email = email;
+        this.name = name;
         this.passwordHash = passwordHash;
     }
 
@@ -46,12 +50,20 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPasswordHash() {

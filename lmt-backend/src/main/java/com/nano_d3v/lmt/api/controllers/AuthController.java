@@ -16,7 +16,7 @@ import com.nano_d3v.lmt.services.AuthService;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    public record Credentials(String username, String password) {}
+    public record Credentials(String name, String email, String password) {}
 
     public final AuthService authService;
 
@@ -26,14 +26,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public Map<String, String> register(@RequestBody Credentials credentials) {
-        User user = authService.register(credentials.username(), credentials.password());
-        return Map.of("username", user.getUsername(), "token", user.getToken());
+        User user = authService.register(credentials.name(), credentials.email(), credentials.password());
+        return Map.of("name", user.getName(), "email", user.getEmail(), "token", user.getToken());
     }
 
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody Credentials credentials) {
-        User user = authService.login(credentials.username(), credentials.password());
-        return Map.of("username", user.getUsername(), "token", user.getToken());
+        User user = authService.login(credentials.email(), credentials.password());
+        return Map.of("name", user.getName(), "email", user.getEmail(), "token", user.getToken());
     }
 
     @PostMapping("/logout")
@@ -45,6 +45,6 @@ public class AuthController {
     // lets the client check whether its stored token is still valid
     @GetMapping("/me")
     public Map<String, String> me(@RequestAttribute("user") User user) {
-        return Map.of("username", user.getUsername());
+        return Map.of("name", user.getName(), "email", user.getEmail());
     }
 }
