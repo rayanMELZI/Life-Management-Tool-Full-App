@@ -33,29 +33,40 @@ export default function App() {
   const [urgency, setUrgency] = useState<"urgent" | "not urgent">("urgent");
   const [newColumnTitle, setNewColumnTitle] = useState("");
 
-  const addTask = () => {
+  const addTask = async () => {
     if (newTask.trim() === "") return;
+    if (!columns.some((column) => column.id === selectedColumn)) return;
 
-    const updatedColumns = columns.map((column) => {
-      if (column.id === selectedColumn) {
-        return {
-          ...column,
-          tasks: [
-            ...column.tasks,
-            {
-              id: Date.now(),
-              content: newTask,
-              importance,
-              urgency,
-            },
-          ],
-        };
+    // interaction with database
+    try {
+      const response = await fetch(`${domain}/api/task/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: newTask,
+          importance,
+          urgency,
+          columnId: selectedColumn,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      return column;
-    });
+      const savedTask: Task = await response.json();
 
-    setColumns(updatedColumns);
-    setNewTask("");
+      setColumns(
+        columns.map((column) =>
+          column.id === selectedColumn
+            ? { ...column, tasks: [...column.tasks, savedTask] }
+            : column
+        )
+      );
+      setNewTask("");
+    } catch (error) {
+      console.error("Failed to add task to database:", error);
+    }
   };
 
   const removeTask = (columnId: number, taskId: number) => {
@@ -65,6 +76,25 @@ export default function App() {
     );
 
     if (!isConfirmed) return; // If the user cancels, stop the deletion.
+
+    // interaction with database
+    const removeTaskFromDatabase = async () => {
+      try {
+        const response = await fetch(`${domain}/api/task/delete`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: taskId }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Failed to delete task from database:", error);
+      }
+    };
+    removeTaskFromDatabase();
 
     const updatedColumns = columns.map((column) => {
       if (column.id === columnId) {
