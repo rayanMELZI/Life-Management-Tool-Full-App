@@ -29,6 +29,17 @@ public class TaskService {
         return taskRepository.save(newTask);
     }
 
+    //update a Task's placement (quadrant and column)
+    public Task updateTask(Integer id, Importance importance, Urgency urgency, Integer columnId){
+        Task task = taskRepository.findById(id).orElseThrow();
+        task.setImportance(importance);
+        task.setUrgency(urgency);
+        if (columnId != null) {
+            task.setColumnId(columnId);
+        }
+        return taskRepository.save(task);
+    }
+
     //delete a Task
     public void deleteTask(Integer id){
         taskRepository.deleteById(id);
