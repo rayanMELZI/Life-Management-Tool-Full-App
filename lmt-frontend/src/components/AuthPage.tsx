@@ -10,12 +10,13 @@ import {
 
 type AuthPageProps = {
   domain: string;
-  onAuth: (auth: { username: string; token: string }) => void;
+  onAuth: (auth: { name: string; email: string; token: string }) => void;
 };
 
 export const AuthPage = ({ domain, onAuth }: AuthPageProps) => {
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,7 +32,7 @@ export const AuthPage = ({ domain, onAuth }: AuthPageProps) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ name, email, password }),
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
@@ -72,18 +73,35 @@ export const AuthPage = ({ domain, onAuth }: AuthPageProps) => {
                 {errorMessage}
               </div>
             )}
+            {mode === "register" && (
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                required
+                autoFocus
+              />
+            )}
             <Input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Username"
-              autoFocus
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              required
+              autoFocus={mode === "login"}
             />
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (at least 4 characters)"
+              placeholder={
+                mode === "register"
+                  ? "Password (at least 8 characters)"
+                  : "Password"
+              }
+              minLength={mode === "register" ? 8 : undefined}
+              required
             />
             <Button
               type="submit"

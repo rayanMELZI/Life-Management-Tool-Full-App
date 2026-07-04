@@ -22,7 +22,8 @@ type ColumnType = {
 };
 
 type Auth = {
-  username: string;
+  name: string;
+  email: string;
   token: string;
 };
 
@@ -48,7 +49,10 @@ export default function App() {
 
   const [auth, setAuth] = useState<Auth | null>(() => {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    return stored ? (JSON.parse(stored) as Auth) : null;
+    if (!stored) return null;
+    const parsed = JSON.parse(stored) as Auth;
+    // ignore sessions stored by older versions of the app
+    return parsed.token && parsed.email ? parsed : null;
   });
 
   // fetch wrapper that sends the token and signs out when it is rejected
@@ -356,7 +360,7 @@ export default function App() {
       {showGuide && <Guide onClose={closeGuide} />}
       <div className="flex justify-end items-center gap-3 mb-2">
         <span className="text-sm text-gray-600">
-          Signed in as <span className="font-semibold">{auth.username}</span>
+          Signed in as <span className="font-semibold">{auth.name}</span>
         </span>
         <Button
           variant="outline"
