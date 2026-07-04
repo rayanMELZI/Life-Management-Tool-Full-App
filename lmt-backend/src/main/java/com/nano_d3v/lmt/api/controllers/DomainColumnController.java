@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nano_d3v.lmt.api.models.DomainColumn;
+import com.nano_d3v.lmt.api.models.User;
 import com.nano_d3v.lmt.services.DomainColumnService;
 
 @RestController
@@ -25,36 +27,36 @@ public class DomainColumnController {
 
     @PostMapping("/add")
     public DomainColumn addColumn(
-        @RequestBody DomainColumn domainColumn
+        @RequestBody DomainColumn domainColumn,
+        @RequestAttribute("user") User user
     ) {
-        return domainColumnService.addDomainColumn(domainColumn.getTitle());
+        return domainColumnService.addDomainColumn(domainColumn.getTitle(), user.getId());
     }
-    
-    // @GetMapping("/id")
-    // public DomainColumn[] getColumnById(@RequestParam Integer id) {
-    //     //return all columns
-    // }
 
-    //return all columns
+    //return the user's columns
     @GetMapping("/all")
-    public List<DomainColumn> getAllColumns() {
-        List<DomainColumn> domainColumns = domainColumnService.getAllColumns();
+    public List<DomainColumn> getAllColumns(@RequestAttribute("user") User user) {
+        List<DomainColumn> domainColumns = domainColumnService.getAllColumns(user.getId());
         return domainColumns;
     }
-    
+
     //update column's title
     @PutMapping("/update")
     public String updateColumn(
-        @RequestBody DomainColumn domainColumn
+        @RequestBody DomainColumn domainColumn,
+        @RequestAttribute("user") User user
     ) {
-        domainColumnService.updateDomainColumn( domainColumn.getId(), domainColumn.getTitle());
+        domainColumnService.updateDomainColumn(domainColumn.getId(), domainColumn.getTitle(), user.getId());
         return "Column updated successfully";
     }
-    
+
     @DeleteMapping("/delete")
-    public String deleteColumn(@RequestBody DomainColumn domainColumn) {
+    public String deleteColumn(
+        @RequestBody DomainColumn domainColumn,
+        @RequestAttribute("user") User user
+    ) {
         //remove column
-        domainColumnService.deleteDomainColumn(domainColumn.getId());
+        domainColumnService.deleteDomainColumn(domainColumn.getId(), user.getId());
         return "Column deleted successfully";
     }
 }

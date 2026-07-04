@@ -12,4 +12,6 @@ public interface DomainColumnRepository extends CrudRepository<DomainColumn, Int
     
     @SuppressWarnings("null")
     List<DomainColumn> findAll();
+
+    List<DomainColumn> findByUserId(Integer userId);
 }

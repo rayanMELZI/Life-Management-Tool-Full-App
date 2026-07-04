@@ -3,6 +3,8 @@ package com.nano_d3v.lmt.api.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +22,11 @@ public class DomainColumn {
 
     @Column(name = "title")
     private String title;
+
+    // owner of the column
+    @JsonIgnore
+    @Column(name = "user_id")
+    private Integer userId;
 
     // Tasks live in their own table (keyed by column_id) and are attached here
     // when columns are sent to the client
@@ -47,6 +54,14 @@ public class DomainColumn {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     
