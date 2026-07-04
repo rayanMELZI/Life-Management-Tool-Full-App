@@ -137,6 +137,39 @@ export default function App() {
     }
   };
 
+  // renames a column
+  const renameColumn = async (columnId: number) => {
+    const column = columns.find((column) => column.id === columnId);
+    if (!column) return;
+
+    const newTitle = globalThis.prompt("New column title:", column.title);
+    if (!newTitle || newTitle.trim() === "") return;
+
+    // interaction with database
+    try {
+      const response = await fetch(`${domain}/api/domainColumn/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: columnId, title: newTitle.trim() }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      setColumns(
+        columns.map((column) =>
+          column.id === columnId
+            ? { ...column, title: newTitle.trim() }
+            : column
+        )
+      );
+    } catch (error) {
+      console.error("Failed to rename column in database:", error);
+    }
+  };
+
   const removeColumn = (columnId: number) => {
     // Show confirmation dialog
     const isConfirmed = globalThis.confirm(
@@ -290,6 +323,7 @@ export default function App() {
                   key={column.id}
                   column={column}
                   removeColumn={removeColumn}
+                  renameColumn={renameColumn}
                   removeTask={removeTask}
                   getTaskColor={getTaskColor}
                 />

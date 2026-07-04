@@ -18,6 +18,7 @@ type Task = {
 type ColumnProps = {
   column: { id: number; title: string; tasks: Task[] };
   removeColumn: (id: number) => void;
+  renameColumn: (id: number) => void;
   removeTask: (id1: number, id2: number) => void;
   getTaskColor: (importance: string, urgency: string) => string;
 };
@@ -25,6 +26,7 @@ type ColumnProps = {
 export const Column = ({
   column,
   removeColumn,
+  renameColumn,
   getTaskColor,
   removeTask,
 }: ColumnProps) => (
@@ -35,7 +37,7 @@ export const Column = ({
         <Button
           variant="ghost"
           size="icon"
-          // onClick={() => removeColumn(column.id)}
+          onClick={() => renameColumn(column.id)}
           className="text-green-200"
         >
           <FilePenLine className="h-4 w-4" />
