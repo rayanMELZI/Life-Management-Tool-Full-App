@@ -110,40 +110,31 @@ export default function App() {
   };
 
   // adds a new column
-  const addColumn = () => {
+  const addColumn = async () => {
     if (newColumnTitle.trim() === "") return;
 
-    const newColumn: ColumnType = {
-      id: Date.now(),
-      title: newColumnTitle,
-      tasks: [],
-    };
-
     // interaction with database
-    const addColumnToDatabase = async () => {
-      try {
-        const response = await fetch(`${domain}/api/domainColumn/add`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ title: newColumn.title }),
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const res = await response.text();
-        console.log("Columns uploaded successfully:", res);
-      } catch (error) {
-        console.error("Failed to add column to database:", error);
+    try {
+      const response = await fetch(`${domain}/api/domainColumn/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: newColumnTitle }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
-    addColumnToDatabase();
 
-    setColumns([...columns, newColumn]);
-    setNewColumnTitle("");
-    setSelectedColumn(newColumn.id);
+      const savedColumn: ColumnType = await response.json();
+      savedColumn.tasks = savedColumn.tasks ?? [];
+
+      setColumns([...columns, savedColumn]);
+      setNewColumnTitle("");
+      setSelectedColumn(savedColumn.id);
+    } catch (error) {
+      console.error("Failed to add column to database:", error);
+    }
   };
 
   const removeColumn = (columnId: number) => {
@@ -186,8 +177,11 @@ export default function App() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+        const data: ColumnType[] = await response.json();
         setColumns(data);
+        if (data.length > 0) {
+          setSelectedColumn(data[0].id);
+        }
       } catch (error) {
         console.error("Failed to fetch columns data:", error);
       }
