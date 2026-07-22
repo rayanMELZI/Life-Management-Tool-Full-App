@@ -3,7 +3,9 @@
 # ---- build ----
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
-RUN corepack enable
+# Pin pnpm 9 to match CI and the pnpm-lock.yaml (v9). pnpm 10+ blocks dependency
+# build scripts by default, which breaks esbuild's binary install.
+RUN npm install -g pnpm@9
 
 # Install deps first (better layer caching). Needs both files for --frozen-lockfile.
 COPY package.json pnpm-lock.yaml ./
