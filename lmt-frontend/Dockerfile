@@ -1,36 +1,25 @@
-# ChromaQuran production image: Next.js app + Chromium (Playwright) + ffmpeg for rendering.
-# Uses a slim Node base and installs ONLY Chromium (not Firefox/WebKit) to keep the image
-# small. ffmpeg comes from the ffmpeg-static npm package. Pin Chromium via the playwright
-# npm version in package.json (npm ci installs it; `playwright install chromium` matches it).
-FROM node:22-bookworm-slim AS base
-
-WORKDIR /app
-# ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+# Vite + React static site: build with pnpm, serve the static bundle with nginx.
 
 # ---- build ----
-# NOTE: do NOT set NODE_ENV=development here. `npm ci` installs devDeps anyway (the Node base
-# leaves NODE_ENV unset), and NODE_ENV=development makes `next build` prerender in dev mode,
-# which crashes the error pages on Linux ("useContext null").
-FROM base AS build
+FROM node:22-bookworm-slim AS build
+WORKDIR /app
+RUN corepack enable
 
-COPY package*.json ./
+# Install deps first (better layer caching). Needs both files for --frozen-lockfile.
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-RUN npm ci
-
+# Build the static bundle (vite outputs to /app/build per vite.config.ts).
+# NOTE: VITE_BACKEND_DOMAIN is baked in at build time from lmt-frontend/.env.
+# Point it at your production API before this image is built. You can also
+# override it here with: --build-arg VITE_BACKEND_DOMAIN=https://api.example.com
 COPY . .
-RUN npm run build
+ARG VITE_BACKEND_DOMAIN
+RUN pnpm build
 
 # ---- runtime ----
-FROM base AS runner
-ENV NODE_ENV=production
-# playwright / ffmpeg-static / pg are external (not bundled), so keep node_modules.
-COPY --from=build /app/package.json /app/package-lock.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
-COPY --from=build /app/next.config.ts ./next.config.ts
-# install ONLY Chromium + its OS libraries (far smaller than the full multi-browser image)
-RUN npx playwright install --with-deps chromium && rm -rf /var/lib/apt/lists/* && mkdir -p renders
-EXPOSE 3000
-# Chromium runs as root here -> needs --no-sandbox (set via compose: CQ_CHROMIUM_ARGS).
-CMD ["npm", "run", "start", "--", "-p", "3000", "-H", "0.0.0.0"]
+FROM nginx:1.27-alpine AS runner
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

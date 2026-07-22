@@ -1,0 +1,35 @@
+# k3s ships with Traefik as the default ingress controller.
+# Replace the two hostnames below with your real domains (or nip.io / sslip.io
+# hostnames pointing at the VM IP for quick testing, e.g. lmt.192-0-2-10.sslip.io).
+#
+# IMPORTANT: the frontend calls the backend at the absolute URL baked in at build
+# time (VITE_BACKEND_DOMAIN). Set that to https://<api-host> below and rebuild the
+# frontend image so the two agree.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lmt
+  namespace: lmt
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: lmt.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+    - host: api.lmt.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8080

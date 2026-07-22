@@ -1,2 +1,8 @@
-*.vscode
-*.git
+node_modules
+build
+dist
+.git
+.vscode
+Dockerfile
+.dockerignore
+npm-debug.log*
