@@ -118,19 +118,14 @@ jobs:
           cat > .env <<EOF
           IMAGE_OWNER=${GITHUB_REPOSITORY_OWNER@L}
           IMAGE_TAG=sha-${GITHUB_SHA::7}
-          POSTGRES_DB=fnts
-          POSTGRES_USER=fnts
+          POSTGRES_DB=lmt
+          POSTGRES_USER=lmt
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           SECURE_COOKIES=${{ vars.SECURE_COOKIES || 'false' }}
           VAPID_PUBLIC_KEY=${{ secrets.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY=${{ secrets.VAPID_PRIVATE_KEY }}
           VAPID_SUBJECT=${{ secrets.VAPID_SUBJECT }}
-          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL=${{ vars.GEMINI_MODEL || 'gemini-flash-latest' }}
-          FEEDBACK_NOTIFY_TO=${{ secrets.FEEDBACK_NOTIFY_TO }}
-          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
-          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
           EOF
 
       - name: Install cloudflared
