@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: lmt.example.com
+    - host: lmt.rayanemelzi.dev
       http:
         paths:
           - path: /
@@ -23,7 +23,7 @@ spec:
                 name: frontend
                 port:
                   number: 80
-    - host: api.lmt.example.com
+    - host: api.lmt.rayanemelzi.dev
       http:
         paths:
           - path: /
